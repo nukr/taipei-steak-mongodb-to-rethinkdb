@@ -1,0 +1,13 @@
+api:
+  build: .
+  volumes:
+    - "./src:/opt/app/src"
+mongodb:
+  image: mongo
+rethinkdb:
+  image: rethinkdb
+mongorestore:
+  links:
+    - mongodb:mongodb
+  command: mongorestore --host mongodb:27017 --dir /opt/misc/taipei_steak
+  volumes: ./misc:/opt/misc

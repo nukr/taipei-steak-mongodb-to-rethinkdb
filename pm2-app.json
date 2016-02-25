@@ -1,0 +1,8 @@
+{
+  "name": "api-boilerplate",
+  "script": "src/index.js",
+  "watch": ["src"],
+  "watch_options": {
+    "usePolling": true
+  }
+}
