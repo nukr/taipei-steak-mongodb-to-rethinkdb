@@ -54,8 +54,8 @@ function mongoConnect (url) {
           meal => {
             delete meal._id
             delete meal.__v
-            meal.createdAt = Date.now()
-            meal.updatedAt = Date.now()
+            meal.createdAt = new Date()
+            meal.updatedAt = new Date()
             return r
               .db('taipei_steak')
               .table('meals')
@@ -78,14 +78,15 @@ function mongoConnect (url) {
           bill => {
             delete bill._id
             delete bill.__v
-            bill.createdAt = new Date(bill.orderTime).getTime()
-            bill.updatedAt = new Date(bill.orderTime).getTime()
+            bill.createdAt = new Date(bill.orderTime)
+            bill.updatedAt = new Date(bill.orderTime)
             delete bill.orderTime
             bill.items = bill.dishes.map(dish => {
               delete dish._id
               delete dish.__v
               return dish
             })
+            bill.discount ? bill.discount = 0.12 : bill.discount = 0
             delete bill.dishes
             return r
               .db('taipei_steak')
@@ -93,6 +94,26 @@ function mongoConnect (url) {
               .insert(bill)
           }
         )
-  let result = await Promise.all(billsInsertPromise)
-  console.log(result)
+  await Promise.all(billsInsertPromise)
+  await r.branch(
+    r.db('taipei_steak').table('orders').indexList().contains('createdAt'),
+    null,
+    r.db('taipei_steak').table('orders').indexCreate('createdAt')
+  )
+  await r.branch(
+    r.db('taipei_steak').table('orders').indexList().contains('updatedAt'),
+    null,
+    r.db('taipei_steak').table('orders').indexCreate('updatedAt')
+  )
+  await r.branch(
+    r.db('taipei_steak').table('meals').indexList().contains('createdAt'),
+    null,
+    r.db('taipei_steak').table('meals').indexCreate('createdAt')
+  )
+  await r.branch(
+    r.db('taipei_steak').table('meals').indexList().contains('updatedAt'),
+    null,
+    r.db('taipei_steak').table('meals').indexCreate('updatedAt')
+  )
+  console.log('done')
 })().catch(console.log)

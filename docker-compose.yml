@@ -11,3 +11,7 @@ mongorestore:
     - mongodb:mongodb
   command: mongorestore --host mongodb:27017 --dir /opt/misc/taipei_steak
   volumes: ./misc:/opt/misc
+inputrethinkdb:
+  links:
+    - mongodb:mongodb
+    - rethinkdb:rethinkdb
